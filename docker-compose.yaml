@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: flowlite_db
+    environment:
+      POSTGRES_USER: flowlite
+      POSTGRES_PASSWORD: flowlite
+      POSTGRES_DB: flowlite
+    ports:
+      - "5432:5432"
+    volumes:
+      - flowlite_pgdata:/var/lib/postgresql/data
+
+volumes:
+  flowlite_pgdata:

@@ -1,0 +1,15 @@
+{
+  "name": "flowlite",
+  "private": true,
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "dev:web": "pnpm --filter @flowlite/web dev",
+    "dev:api": "pnpm --filter @flowlite/api start:dev",
+    "dev": "concurrently \"pnpm dev:api\" \"pnpm dev:web\"",
+    "lint": "pnpm -r lint",
+    "build": "pnpm -r build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
