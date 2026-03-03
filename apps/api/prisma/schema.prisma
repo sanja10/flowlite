@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EventType {
+  ITEM_CREATED
+  ITEM_UPDATED
+  ITEM_MOVED
+  ITEM_DELETED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  boards       Board[]
+}
+
+model Board {
+  id          String   @id @default(uuid())
+  ownerId     String
+  name        String
+  templateKey String
+  stuckDays   Int      @default(3)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  archivedAt  DateTime?
+
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  statuses    Status[]
+  items       Item[]
+  events      Event[]
+
+  @@index([ownerId])
+  @@index([archivedAt])
+}
+
+model Status {
+  id        String   @id @default(uuid())
+  boardId    String
+  name       String
+  order      Int
+  isDone     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  items      Item[]
+  fromEvents Event[]  @relation("EventFromStatus")
+  toEvents   Event[]  @relation("EventToStatus")
+
+  @@unique([boardId, order])
+  @@index([boardId])
+}
+
+model Item {
+  id         String   @id @default(uuid())
+  boardId    String
+  statusId   String
+  title      String
+  dueAt      DateTime?
+  note       String?
+  tag        String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  archivedAt DateTime?
+
+  board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  status     Status   @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  events     Event[]
+
+  @@index([boardId, statusId])
+  @@index([boardId, dueAt])
+  @@index([archivedAt])
+}
+
+model Event {
+  id           String    @id @default(uuid())
+  boardId      String
+  itemId       String
+  type         EventType
+  fromStatusId String?
+  toStatusId   String?
+  metadata     Json?
+  createdAt    DateTime  @default(now())
+
+  board        Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  item         Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  fromStatus   Status?   @relation("EventFromStatus", fields: [fromStatusId], references: [id], onDelete: SetNull)
+  toStatus     Status?   @relation("EventToStatus", fields: [toStatusId], references: [id], onDelete: SetNull)
+
+  @@index([boardId, createdAt])
+  @@index([itemId, createdAt])
+}
