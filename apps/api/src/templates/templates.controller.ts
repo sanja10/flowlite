@@ -6,7 +6,7 @@ import { TEMPLATES } from '@flowlite/shared';
 @Controller('templates')
 export class TemplatesController {
   @Get()
-  list(): any {
+  list() {
     return TEMPLATES;
   }
 }
