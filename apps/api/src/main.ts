@@ -26,10 +26,16 @@ async function bootstrap() {
     .setTitle('FlowLite API')
     .setDescription('FlowLite backend API')
     .setVersion('0.1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'bearer',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   const prisma = app.get(PrismaService);
   prisma.enableShutdownHooks(app);
