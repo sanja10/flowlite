@@ -6,7 +6,7 @@ import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto';
 
 @ApiTags('boards')
-@ApiBearerAuth()
+@ApiBearerAuth('bearer')
 @UseGuards(JwtAuthGuard)
 @Controller('boards')
 export class BoardsController {
